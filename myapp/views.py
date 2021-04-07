@@ -74,3 +74,5 @@ class DeleteUserView(TemplateViewMethods):
         user = User.objects.get(id=kwargs['user_id'])
         user.delete()
         return self.render_to_response(request, context=None)
+    
+    

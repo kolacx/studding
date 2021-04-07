@@ -26,7 +26,6 @@ class TemplateRenderMixin:
 class CreateViewMixin:
     form_class = None
 
-
     def get_form_class(self):
         return self.form_class
 
