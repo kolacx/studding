@@ -3,7 +3,7 @@ from django.http import HttpResponseNotAllowed
 
 class ViewsSuper:
 
-    http_method = ['get', 'post']
+    http_method = ['get', 'post', 'delete']
 
     def __init__(self, **kwargs):
         for key, value in kwargs.items():

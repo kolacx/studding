@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User</title>
+</head>
+<body>
+<div>User Page</div>
+
+<div>All users</div>
+{% for user in users %}
+    <p>Name : {{ user.name }}</p>
+    <p>Age : {{ user.age }}</p>
+    <p>ID: {{ user.id }}</p>
+<hr>
+{% endfor %}
+</body>
+</html>

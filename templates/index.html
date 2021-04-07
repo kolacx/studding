@@ -3,6 +3,10 @@
 
 </head>
 <body>
-Hi from tempalte
+Hi from tempalte {{ user }}
+{{context}}
+{% for o in user %}
+{{o}}
+{% endfor %}
 </body>
 </html>

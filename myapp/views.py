@@ -3,35 +3,31 @@ from django.template.response import TemplateResponse
 from django import forms
 
 from myapp.view_new import ViewsSuper
+from myapp.mixin import TemplateRenderMixin, ContextMixin, CreateViewMixin
+
+from myapp.models import User
 
 
-class TemplateViewMethods(ViewsSuper):
-
-    template_name = None
+class TemplateViewMethods(TemplateRenderMixin, ContextMixin, ViewsSuper):
 
     def get(self, request, *args, **kwargs):
-        context = self.get_context(request, *args, **kwargs)
-        return TemplateResponse(request, self.template_name, context)
-
-    def get_context(self, request, *args, **kwargs):
-        return {}
+        context = self.get_context_data(**kwargs)
+        return self.render_to_response(request, context)
 
 
-class CreateViewMethods(ViewsSuper):
-
-    form_class = None
+class CreateViewMethods(CreateViewMixin, TemplateRenderMixin, ContextMixin, ViewsSuper):
 
     def post(self, request, *args, **kwargs):
-        if self.valid_post(request, *args,**kwargs):
-            # In this place we add to DB
-            return HttpResponse(b'post ok')
+        # print(request.POST)
+        form = self.get_form(request.POST)
+        if form.is_valid():
+            return self.form_valid(form)
         else:
-            # In this place we Response some error
+            return self.form_invalid(form)
 
-            return HttpResponse(f'not ok {self.form_class(request.POST).errors.as_json()}')
-
-    def valid_post(self, request, *args, **kwargs):
-        return self.form_class(request.POST).is_valid()
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        return self.render_to_response(request, context)
 
 
 class FormSuper(forms.Form):
@@ -40,6 +36,41 @@ class FormSuper(forms.Form):
 
 
 class CreateView(CreateViewMethods, TemplateViewMethods):
-
     template_name = 'index.html'
     form_class = FormSuper
+
+    def form_valid(self, form):
+        User.objects.create(name=form.data['name'],
+                            age=form.data['age'])
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        print('Enter Invalid')
+        return super().form_invalid(form)
+
+
+class TemplateView(TemplateViewMethods):
+    template_name = 'index.html'
+
+    def get_context_data(self, **kwargs):
+        context = {'user': ['qwe1', 'qwe2'], 'user2': 'qqwwee'}
+        return context
+
+
+class UserView(TemplateViewMethods):
+    template_name = 'user.html'
+
+    def get(self, request, *args, **kwargs):
+        user = User.objects.all()
+        context = {'users': user}
+
+        return self.render_to_response(request, context)
+
+
+class DeleteUserView(TemplateViewMethods):
+    template_name = 'user.html'
+
+    def delete(self, request, *args, **kwargs):
+        user = User.objects.get(id=kwargs['user_id'])
+        user.delete()
+        return self.render_to_response(request, context=None)
