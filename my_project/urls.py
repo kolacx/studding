@@ -16,8 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from drfapp.urls import router
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('tests/', include('myapp.urls')),
+    path('drf/', include(router.urls)),
+    path('serializer/', include('serializer.urls'))
 ]
